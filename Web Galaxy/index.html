@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Pakan Anjing & Kucing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F4F2ED;
+    --panel: #FFFFFF;
+    --ink: #1E2B27;
+    --ink-soft: #5B6B65;
+    --pine: #1B4B43;
+    --pine-dark: #123330;
+    --amber: #E2A23B;
+    --line: #E4E0D6;
+
+    --red-bg: #FCE4E2;   --red-fg: #9C2B22;   --red-strip: #C94A3D;
+    --yellow-bg: #FBF0D6; --yellow-fg: #8A5E12; --yellow-strip: #E2A23B;
+    --green-bg: #E3F0E4;  --green-fg: #276635;  --green-strip: #3F9350;
+    --blue-bg: #E1EAF5;   --blue-fg: #2A4E80;   --blue-strip: #3E6EA8;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+
+  .hidden{display:none !important;}
+
+  /* ---------- Login screen ---------- */
+  #loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:radial-gradient(circle at 20% 20%, #1F5148 0%, var(--pine-dark) 55%, #0D2422 100%);
+  }
+  .login-card{
+    background:var(--panel);
+    width:100%;max-width:380px;
+    border-radius:20px;
+    padding:34px 30px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35);
+  }
+  .login-card .paw-wrap{
+    width:52px;height:52px;
+    background:var(--pine);
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:16px;
+  }
+  .login-card .paw-wrap svg{width:28px;height:28px;}
+  .login-card h1{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    margin:0 0 4px;
+    color:var(--pine-dark);
+  }
+  .login-card p.sub{
+    margin:0 0 22px;
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;
+    font-size:13.5px;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  .btn-primary{
+    background:var(--pine);border:none;color:#fff;padding:11px 18px;border-radius:9px;
+    font-weight:700;font-size:13.5px;cursor:pointer;width:100%;margin-top:6px;
+  }
+  .btn-primary:hover{background:var(--pine-dark);}
+  .login-error{
+    color:var(--red-fg);font-size:12.5px;margin-top:10px;display:none;
+    background:var(--red-bg);padding:8px 10px;border-radius:8px;
+  }
+  .login-note{
+    margin-top:18px;font-size:11px;color:var(--ink-soft);line-height:1.6;
+    border-top:1px solid var(--line);padding-top:14px;
+  }
+
+  /* ---------- App shell ---------- */
+  .wrap{max-width:1220px;margin:0 auto;padding:20px 20px 60px;}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;flex-wrap:wrap;margin-bottom:16px;
+  }
+  .who{
+    font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .who b{color:var(--ink);}
+  .role-tag{
+    background:var(--pine);color:#fff;font-size:10.5px;font-weight:700;
+    padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:0.04em;
+  }
+  .branch-select{
+    padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;background:#fff;
+  }
+  .btn-logout{
+    background:transparent;border:1px solid var(--line);color:var(--ink-soft);
+    padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .btn-logout:hover{background:#F1EEE6;}
+
+  .hero{
+    background:linear-gradient(135deg,var(--pine) 0%,var(--pine-dark) 100%);
+    border-radius:20px;padding:26px 30px;color:#F6F4EC;
+    display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;right:-40px;top:-40px;width:220px;height:220px;
+    background:radial-gradient(circle, rgba(226,162,59,0.28) 0%, rgba(226,162,59,0) 70%);
+  }
+  .hero-text{display:flex;gap:14px;align-items:center;z-index:1;}
+  .paw-icon{width:42px;height:42px;flex-shrink:0;opacity:0.9;}
+  .title-row{display:flex;align-items:center;gap:10px;}
+  .title-row h1{
+    font-family:'Fraunces', serif;font-weight:600;font-size:25px;margin:0;letter-spacing:0.2px;
+  }
+  .edit-title-btn{
+    background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+    color:#F6F4EC;width:28px;height:28px;border-radius:8px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
+  }
+  .edit-title-btn:hover{background:rgba(255,255,255,0.28);}
+  .hero-text p{margin:4px 0 0;font-size:13px;color:#CFE0DB;max-width:440px;line-height:1.5;}
+
+  .stats{display:flex;gap:12px;z-index:1;flex-wrap:wrap;}
+  .stat-card{
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);
+    border-radius:14px;padding:10px 15px;min-width:78px;text-align:center;
+  }
+  .stat-card .num{font-family:'IBM Plex Mono', monospace;font-size:20px;font-weight:600;line-height:1;}
+  .stat-card .lbl{font-size:10.5px;color:#CFE0DB;margin-top:4px;}
+  .stat-card.red .num{color:#F3A79E;}
+  .stat-card.yellow .num{color:#F5D189;}
+  .stat-card.green .num{color:#9CDDAA;}
+  .stat-card.blue .num{color:#A9C6EA;}
+
+  /* ---------- Controls ---------- */
+  .controls{margin-top:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;}
+  .pill{
+    border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);
+    padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .pill.active.all{background:var(--pine);color:#fff;border-color:transparent;}
+  .pill.active.safe{background:var(--green-strip);color:#fff;border-color:transparent;}
+  .pill.active.soon{background:var(--yellow-strip);color:#fff;border-color:transparent;}
+  .pill.active.expired{background:var(--red-strip);color:#fff;border-color:transparent;}
+  .pill.active.accept{background:var(--blue-strip);color:#fff;border-color:transparent;}
+  .pill .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+  .pill .dot.safe{background:var(--green-strip);}
+  .pill .dot.soon{background:var(--yellow-strip);}
+  .pill .dot.expired{background:var(--red-strip);}
+  .pill .dot.accept{background:var(--blue-strip);}
+
+  .right-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .search{
+    border:1px solid var(--line);background:var(--panel);padding:9px 14px;border-radius:10px;
+    font-size:13px;width:200px;
+  }
+  .search:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  .btn-add{
+    background:var(--amber);color:#3A2A0B;border:none;padding:10px 16px;border-radius:10px;
+    font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .btn-export{
+    background:var(--panel);color:var(--pine-dark);border:1px solid var(--pine);
+    padding:10px 16px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .btn-export:hover{background:#EAF3F0;}
+
+  /* ---------- Table ---------- */
+  .table-card{margin-top:16px;background:var(--panel);border-radius:18px;border:1px solid var(--line);overflow:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:920px;}
+  thead th{
+    text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);
+    background:#FAF9F5;padding:13px 15px;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  tbody td{padding:11px 15px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tbody tr td:first-child{border-left:4px solid transparent;}
+  tbody tr.expired{background:var(--red-bg);} tbody tr.expired td:first-child{border-left-color:var(--red-strip);}
+  tbody tr.soon{background:var(--yellow-bg);} tbody tr.soon td:first-child{border-left-color:var(--yellow-strip);}
+  tbody tr.safe{background:var(--green-bg);} tbody tr.safe td:first-child{border-left-color:var(--green-strip);}
+  tbody tr.accept{background:var(--blue-bg);} tbody tr.accept td:first-child{border-left-color:var(--blue-strip);}
+
+  .no-col{color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  .name-col{font-weight:600;}
+  .num-col{font-family:'IBM Plex Mono',monospace;text-align:center;}
+  .days-col{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:center;}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:700;}
+  .badge.expired{background:var(--red-fg);color:#fff;}
+  .badge.soon{background:var(--yellow-fg);color:#fff;}
+  .badge.safe{background:var(--green-fg);color:#fff;}
+  .badge.accept{background:var(--blue-fg);color:#fff;}
+
+  .row-actions{display:flex;gap:6px;justify-content:flex-end;}
+  .icon-btn{
+    border:1px solid var(--line);background:#fff;width:29px;height:29px;border-radius:8px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:13px;
+  }
+  .icon-btn:hover{background:#F1EEE6;}
+  .icon-btn.danger:hover{background:var(--red-bg);color:var(--red-fg);border-color:var(--red-strip);}
+  .icon-btn.accept-on{background:var(--blue-fg);color:#fff;border-color:var(--blue-fg);}
+
+  .empty-state{padding:56px 20px;text-align:center;color:var(--ink-soft);}
+
+  .footnote{margin-top:14px;font-size:11.5px;color:var(--ink-soft);text-align:center;}
+
+  /* ---------- Modal (add/edit) ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(18,30,27,0.45);display:none;
+    align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .overlay.open{display:flex;}
+  .modal{background:var(--panel);border-radius:18px;width:100%;max-width:440px;padding:26px;box-shadow:0 20px 50px rgba(0,0,0,0.25);}
+  .modal h2{font-family:'Fraunces',serif;font-size:20px;margin:0 0 18px;color:var(--pine-dark);}
+  .field-row{display:flex;gap:12px;}
+  .field-row .field{flex:1;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+  .btn-secondary{
+    background:transparent;border:1px solid var(--line);color:var(--ink-soft);padding:9px 16px;
+    border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;
+  }
+  .modal .btn-primary{width:auto;margin-top:0;padding:9px 18px;}
+  .error-text{color:var(--red-fg);font-size:12px;margin-top:6px;display:none;}
+
+  @media (max-width:720px){
+    .hero{flex-direction:column;align-items:flex-start;}
+    .stats{width:100%;}
+    .stat-card{min-width:0;flex:1;}
+    .controls{flex-direction:column;align-items:stretch;}
+    .right-controls{width:100%;}
+    .search{flex:1;width:auto;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN SCREEN ================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="paw-wrap">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="16" rx="7" ry="9" fill="#F6F4EC"/>
+        <ellipse cx="38" cy="12" rx="7" ry="9" fill="#F6F4EC"/>
+        <ellipse cx="10" cy="32" rx="6" ry="8" fill="#F6F4EC"/>
+        <ellipse cx="48" cy="30" rx="6" ry="8" fill="#F6F4EC"/>
+        <path d="M29 30c-10 0-17 8-17 16 0 8 6 12 15 12s10-4 17-4 13 4 17-4c4-8-2-16-12-16-6 0-8 4-13 4s-3-8-7-8z" fill="#F6F4EC"/>
+      </svg>
+    </div>
+    <h1>Masuk ke Akun Toko</h1>
+    <p class="sub">Login khusus cabang. Setiap toko hanya dapat melihat & mengisi datanya sendiri.</p>
+
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="loginUser" autocomplete="off" placeholder="mis. jakarta">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" id="btnLogin">Masuk</button>
+    <div class="login-error" id="loginError">Username atau password salah.</div>
+
+    <div class="login-note">
+      Akun &amp; kata sandi diatur oleh admin pusat dan dibagikan langsung ke masing-masing cabang.
+      Halaman ini adalah prototipe front-end sederhana — cocok untuk pemakaian internal, bukan untuk data yang sangat sensitif.
+    </div>
+  </div>
+</div>
+
+<!-- ================= MAIN APP ================= -->
+<div class="wrap hidden" id="appScreen">
+
+  <div class="topbar">
+    <div class="who">
+      <span>Login sebagai <b id="whoUser"></b></span>
+      <span class="role-tag" id="whoRole"></span>
+      <select class="branch-select hidden" id="branchSelect"></select>
+    </div>
+    <button class="btn-logout" id="btnLogout">Keluar</button>
+  </div>
+
+  <div class="hero">
+    <div class="hero-text">
+      <svg class="paw-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="16" rx="7" ry="9" fill="#F6F4EC"/>
+        <ellipse cx="38" cy="12" rx="7" ry="9" fill="#F6F4EC"/>
+        <ellipse cx="10" cy="32" rx="6" ry="8" fill="#F6F4EC"/>
+        <ellipse cx="48" cy="30" rx="6" ry="8" fill="#F6F4EC"/>
+        <path d="M29 30c-10 0-17 8-17 16 0 8 6 12 15 12s10-4 17-4 13 4 17-4c4-8-2-16-12-16-6 0-8 4-13 4s-3-8-7-8z" fill="#F6F4EC"/>
+      </svg>
+      <div>
+        <div class="title-row">
+          <h1 id="storeTitle">Data Stok & Kadaluarsa Pakan</h1>
+          <button class="edit-title-btn" id="btnEditTitle" title="Ganti nama toko">✎</button>
+        </div>
+        <p>Pantau stok pakan anjing &amp; kucing beserta sisa hari sebelum kadaluarsa. Status &amp; warna terupdate otomatis.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-card green"><div class="num" id="statSafe">0</div><div class="lbl">Aman</div></div>
+      <div class="stat-card yellow"><div class="num" id="statSoon">0</div><div class="lbl">&lt; 3 Bulan</div></div>
+      <div class="stat-card red"><div class="num" id="statExpired">0</div><div class="lbl">Kadaluarsa</div></div>
+      <div class="stat-card blue"><div class="num" id="statAccept">0</div><div class="lbl">Accept</div></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="filters">
+      <button class="pill active all" data-filter="all">Semua</button>
+      <button class="pill" data-filter="safe"><span class="dot safe"></span>Aman</button>
+      <button class="pill" data-filter="soon"><span class="dot soon"></span>&lt; 3 Bulan</button>
+      <button class="pill" data-filter="expired"><span class="dot expired"></span>Kadaluarsa</button>
+      <button class="pill" data-filter="accept"><span class="dot accept"></span>Accept</button>
+    </div>
+    <div class="right-controls">
+      <input type="text" class="search" id="searchInput" placeholder="Cari nama barang...">
+      <button class="btn-export" id="btnExport">⬇ Download Excel</button>
+      <button class="btn-add" id="btnAdd">+ Tambah Pakan</button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>No</th><th>Nama Barang</th><th>Stok</th><th>Tgl Masuk</th><th>Tgl Expired</th>
+          <th>Sisa Hari</th><th>Status</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div>Belum ada data. Klik "+ Tambah Pakan" untuk mulai mengisi.</div>
+    </div>
+  </div>
+
+  <div class="footnote">Data tersimpan otomatis per cabang &amp; tidak terlihat oleh cabang lain.</div>
+</div>
+
+<!-- ================= Modal add/edit ================= -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modalTitle">Tambah Pakan</h2>
+    <input type="hidden" id="editId">
+    <div class="field">
+      <label>Nama Barang</label>
+      <input type="text" id="fName" placeholder="cth. Royal Canin Adult 3kg">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Jumlah Stok</label>
+        <input type="number" id="fStock" min="0" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Tanggal Masuk</label>
+        <input type="date" id="fMasuk">
+      </div>
+    </div>
+    <div class="field">
+      <label>Tanggal Expired</label>
+      <input type="date" id="fExpired">
+    </div>
+    <div class="error-text" id="formError">Mohon lengkapi semua kolom dengan benar.</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnCancel">Batal</button>
+      <button class="btn-primary" id="btnSave">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= Accounts (15 branches + 1 admin) ================= */
+const ACCOUNTS = [
+  { username:'jakarta',     password:'jakarta123',     role:'store', label:'Cabang Jakarta' },
+  { username:'bandung',     password:'bandung123',     role:'store', label:'Cabang Bandung' },
+  { username:'surabaya',    password:'surabaya123',    role:'store', label:'Cabang Surabaya' },
+  { username:'semarang',    password:'semarang123',    role:'store', label:'Cabang Semarang' },
+  { username:'yogyakarta',  password:'yogya123',       role:'store', label:'Cabang Yogyakarta' },
+  { username:'malang',      password:'malang123',      role:'store', label:'Cabang Malang' },
+  { username:'solo',        password:'solo123',        role:'store', label:'Cabang Solo' },
+  { username:'medan',       password:'medan123',       role:'store', label:'Cabang Medan' },
+  { username:'bali',        password:'bali123',        role:'store', label:'Cabang Bali' },
+  { username:'makassar',    password:'makassar123',    role:'store', label:'Cabang Makassar' },
+  { username:'palembang',   password:'palembang123',   role:'store', label:'Cabang Palembang' },
+  { username:'balikpapan',  password:'balikpapan123',  role:'store', label:'Cabang Balikpapan' },
+  { username:'bekasi',      password:'bekasi123',      role:'store', label:'Cabang Bekasi' },
+  { username:'tangerang',   password:'tangerang123',   role:'store', label:'Cabang Tangerang' },
+  { username:'bogor',       password:'bogor123',       role:'store', label:'Cabang Bogor' },
+  { username:'admin',       password:'admin123',       role:'admin', label:'Admin Pusat' },
+];
+const STORE_ACCOUNTS = ACCOUNTS.filter(a => a.role === 'store');
+
+let session = null;       // {username, role, label}
+let activeStoreId = null; // username of the branch currently being viewed
+let items = [];
+let currentFilter = 'all';
+let searchTerm = '';
+
+/* ================= Storage ================= */
+/* Uses window.storage (Claude artifact API) when running inside Claude.ai.
+   When self-hosted (e.g. on GitHub Pages), that API doesn't exist, so this
+   falls back to the browser's localStorage — data then persists on that
+   specific browser/device only (there is no shared server/database here). */
+const memoryFallback = {};
+async function storageGet(key){
+  if(window.storage && typeof window.storage.get === 'function'){
+    try{ return await window.storage.get(key, false); }
+    catch(e){ /* fall through to localStorage */ }
+  }
+  try{
+    const raw = window.localStorage.getItem(key);
+    return raw !== null ? { value: raw } : null;
+  }catch(e){
+    return memoryFallback[key] ? { value: memoryFallback[key] } : null;
+  }
+}
+async function storageSet(key, value){
+  if(window.storage && typeof window.storage.set === 'function'){
+    try{ await window.storage.set(key, value, false); return; }catch(e){ /* fall through */ }
+  }
+  try{ window.localStorage.setItem(key, value); }
+  catch(e){ memoryFallback[key] = value; }
+}
+
+/* ================= Date / status helpers ================= */
+function todayStart(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function daysUntil(expiredISO){
+  const exp = new Date(expiredISO + 'T00:00:00');
+  return Math.round((exp - todayStart()) / 86400000);
+}
+function statusOf(it){
+  if(it.accepted) return 'accept';
+  const days = daysUntil(it.expired);
+  if(days < 0) return 'expired';
+  if(days <= 90) return 'soon';
+  return 'safe';
+}
+function fmtDate(iso){ const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+function uid(){ return 'p' + Math.random().toString(36).slice(2,9) + Date.now().toString(36); }
+
+/* ================= Seed data (demo content for one branch) ================= */
+function seedData(){
+  const dogFood = ["Pedigree Adult Chicken & Rice 3kg","Pedigree Puppy 1kg","ProPlan Adult Dog Chicken 3kg","ProPlan Puppy Small Breed 1.5kg","Royal Canin Medium Adult 4kg","Royal Canin Mini Puppy 2kg","Royal Canin Maxi Adult 15kg","Bolt Dog Food Beef 1kg","Bolt Dog Food Chicken 3kg","Equilibrio Adult Dog 2kg","Equilibrio Puppy Small Breed 3kg","Friskies Dog Adult 1kg","Champ Dog Food Beef 20kg","SmartHeart Adult Dog 3kg","SmartHeart Gold Puppy 1.5kg","Alpo Adult Dog Beef 3kg","Hill's Science Diet Adult 3kg","Nutrisource Dog Adult 5kg","Comfeed Dog Adult Beef 3kg","Royal Canin Dermacomfort 2kg"];
+  const catFood = ["Whiskas Adult Ocean Fish 1.2kg","Whiskas Kitten 1kg","Me-O Adult Tuna 1kg","Me-O Kitten Formula 1kg","Me-O Persian Adult 7kg","ProPlan Adult Cat Salmon 1.5kg","ProPlan Kitten 1kg","Royal Canin Kitten 2kg","Royal Canin Persian Adult 2kg","Friskies Adult Cat 1.2kg","Bolt Cat Food Tuna 1kg","Equilibrio Cat Adult 1.5kg","SmartHeart Adult Cat Tuna 1.2kg","Kit Cat Adult Chicken 1kg","Nekko Adult Cat 1kg","Classic Cat Food Tuna 1kg","Hill's Science Diet Adult Cat 2kg"];
+  const names = [...dogFood, ...catFood];
+  let seed = 7;
+  function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  const today = todayStart();
+  return names.map((name, i) => {
+    const stock = 4 + Math.floor(rnd() * 56);
+    const masukDaysAgo = 10 + Math.floor(rnd() * 190);
+    const masuk = new Date(today); masuk.setDate(masuk.getDate() - masukDaysAgo);
+    const bucket = i % 3;
+    let expOffset;
+    if(bucket === 0) expOffset = -1 - Math.floor(rnd() * 59);
+    else if(bucket === 1) expOffset = 1 + Math.floor(rnd() * 88);
+    else expOffset = 91 + Math.floor(rnd() * 400);
+    const exp = new Date(today); exp.setDate(exp.getDate() + expOffset);
+    return { id: uid(), name, stock, masuk: masuk.toISOString().slice(0,10),
+             expired: exp.toISOString().slice(0,10), accepted:false };
+  });
+}
+
+/* ================= Login ================= */
+document.getElementById('btnLogin').addEventListener('click', doLogin);
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value;
+  const acc = ACCOUNTS.find(a => a.username === u && a.password === p);
+  const errBox = document.getElementById('loginError');
+  if(!acc){
+    errBox.style.display = 'block';
+    return;
+  }
+  errBox.style.display = 'none';
+  session = { username: acc.username, role: acc.role, label: acc.label };
+  activeStoreId = acc.role === 'admin' ? STORE_ACCOUNTS[0].username : acc.username;
+  enterApp();
+}
+
+function doLogout(){
+  session = null;
+  activeStoreId = null;
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+}
+document.getElementById('btnLogout').addEventListener('click', doLogout);
+
+async function enterApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+
+  document.getElementById('whoUser').textContent = session.label;
+  document.getElementById('whoRole').textContent = session.role === 'admin' ? 'Admin' : 'Toko';
+
+  const branchSelect = document.getElementById('branchSelect');
+  if(session.role === 'admin'){
+    branchSelect.classList.remove('hidden');
+    branchSelect.innerHTML = STORE_ACCOUNTS.map(a => `<option value="${a.username}">${a.label}</option>`).join('');
+    branchSelect.value = activeStoreId;
+    branchSelect.onchange = async () => { activeStoreId = branchSelect.value; await loadStoreData(); render(); };
+  }else{
+    branchSelect.classList.add('hidden');
+  }
+
+  await loadStoreData();
+  render();
+}
+
+/* ================= Per-store persistence ================= */
+async function loadStoreData(){
+  const itemsKey = `pakan-items-${activeStoreId}`;
+  const nameKey = `pakan-storename-${activeStoreId}`;
+
+  const itemRes = await storageGet(itemsKey);
+  if(itemRes && itemRes.value){
+    items = JSON.parse(itemRes.value);
+  }else{
+    // First branch (jakarta) gets demo sample data; every other branch starts empty
+    items = activeStoreId === 'jakarta' ? seedData() : [];
+    await storageSet(itemsKey, JSON.stringify(items));
+  }
+
+  const nameRes = await storageGet(nameKey);
+  const defaultLabel = ACCOUNTS.find(a => a.username === activeStoreId)?.label || 'Data Stok & Kadaluarsa Pakan';
+  document.getElementById('storeTitle').textContent = (nameRes && nameRes.value) ? nameRes.value : defaultLabel;
+}
+
+async function persistItems(){
+  await storageSet(`pakan-items-${activeStoreId}`, JSON.stringify(items));
+}
+
+/* ================= Editable store title ================= */
+document.getElementById('btnEditTitle').addEventListener('click', async () => {
+  const current = document.getElementById('storeTitle').textContent;
+  const next = prompt('Nama toko / judul halaman:', current);
+  if(next === null) return;
+  const trimmed = next.trim();
+  if(!trimmed) return;
+  document.getElementById('storeTitle').textContent = trimmed;
+  await storageSet(`pakan-storename-${activeStoreId}`, trimmed);
+});
+
+/* ================= Render ================= */
+function render(){
+  const tbody = document.getElementById('tableBody');
+  const emptyState = document.getElementById('emptyState');
+
+  const enriched = items.map(it => ({...it, days: daysUntil(it.expired), status: statusOf(it)}));
+  enriched.sort((a,b) => a.days - b.days);
+
+  let counts = {safe:0, soon:0, expired:0, accept:0};
+  enriched.forEach(it => counts[it.status]++);
+  document.getElementById('statSafe').textContent = counts.safe;
+  document.getElementById('statSoon').textContent = counts.soon;
+  document.getElementById('statExpired').textContent = counts.expired;
+  document.getElementById('statAccept').textContent = counts.accept;
+
+  const term = searchTerm.trim().toLowerCase();
+  const filtered = enriched.filter(it => {
+    if(currentFilter !== 'all' && it.status !== currentFilter) return false;
+    if(term && !it.name.toLowerCase().includes(term)) return false;
+    return true;
+  });
+
+  tbody.innerHTML = '';
+  emptyState.style.display = filtered.length ? 'none' : 'block';
+
+  const statusLabel = {safe:'Aman', soon:'Segera Kadaluarsa', expired:'Kadaluarsa', accept:'Accept'};
+  const isAdmin = session.role === 'admin';
+
+  filtered.forEach((it, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = it.status;
+    tr.innerHTML = `
+      <td class="no-col">${idx+1}</td>
+      <td class="name-col">${escapeHtml(it.name)}</td>
+      <td class="num-col">${it.stock}</td>
+      <td class="num-col">${fmtDate(it.masuk)}</td>
+      <td class="num-col">${fmtDate(it.expired)}</td>
+      <td class="days-col">${it.days}</td>
+      <td><span class="badge ${it.status}">${statusLabel[it.status]}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn ${it.accepted ? 'accept-on' : ''}" title="Tandai Accept" data-accept="${it.id}">✓</button>
+          <button class="icon-btn" title="Edit" data-edit="${it.id}">✎</button>
+          ${isAdmin ? `<button class="icon-btn danger" title="Hapus" data-del="${it.id}">✕</button>` : ''}
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openModal(b.dataset.edit)));
+  tbody.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deleteItem(b.dataset.del)));
+  tbody.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => toggleAccept(b.dataset.accept)));
+}
+
+function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+/* ================= CRUD ================= */
+async function toggleAccept(id){
+  const it = items.find(x => x.id === id);
+  it.accepted = !it.accepted;
+  await persistItems();
+  render();
+}
+
+async function deleteItem(id){
+  if(session.role !== 'admin') return; // safety: only admin can delete
+  if(!confirm('Hapus data pakan ini?')) return;
+  items = items.filter(x => x.id !== id);
+  await persistItems();
+  render();
+}
+
+/* ================= Modal (add/edit) ================= */
+const overlay = document.getElementById('overlay');
+const modalTitle = document.getElementById('modalTitle');
+const fName = document.getElementById('fName');
+const fStock = document.getElementById('fStock');
+const fMasuk = document.getElementById('fMasuk');
+const fExpired = document.getElementById('fExpired');
+const editId = document.getElementById('editId');
+const formError = document.getElementById('formError');
+
+function openModal(id){
+  formError.style.display = 'none';
+  if(id){
+    const it = items.find(x => x.id === id);
+    modalTitle.textContent = 'Edit Pakan';
+    editId.value = id;
+    fName.value = it.name; fStock.value = it.stock; fMasuk.value = it.masuk; fExpired.value = it.expired;
+  }else{
+    modalTitle.textContent = 'Tambah Pakan';
+    editId.value = ''; fName.value = ''; fStock.value = '';
+    fMasuk.value = new Date().toISOString().slice(0,10); // realtime: hari ini
+    fExpired.value = '';
+  }
+  overlay.classList.add('open');
+  fName.focus();
+}
+function closeModal(){ overlay.classList.remove('open'); }
+
+async function saveItem(){
+  const name = fName.value.trim();
+  const stock = parseInt(fStock.value, 10);
+  const masuk = fMasuk.value;
+  const expired = fExpired.value;
+  if(!name || isNaN(stock) || stock < 0 || !masuk || !expired){
+    formError.style.display = 'block';
+    return;
+  }
+  if(editId.value){
+    const it = items.find(x => x.id === editId.value);
+    it.name = name; it.stock = stock; it.masuk = masuk; it.expired = expired;
+  }else{
+    items.push({id: uid(), name, stock, masuk, expired, accepted:false});
+  }
+  await persistItems();
+  closeModal();
+  render();
+}
+
+document.getElementById('btnAdd').addEventListener('click', () => openModal(null));
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+document.getElementById('btnSave').addEventListener('click', saveItem);
+overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
+
+document.querySelectorAll('.pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+document.getElementById('searchInput').addEventListener('input', e => { searchTerm = e.target.value; render(); });
+
+/* ================= CSV export (opens directly in Excel / Google Sheets) ================= */
+document.getElementById('btnExport').addEventListener('click', () => {
+  const statusLabel = {safe:'Aman', soon:'Segera Kadaluarsa', expired:'Kadaluarsa', accept:'Accept'};
+  const enriched = items.map(it => ({...it, days: daysUntil(it.expired), status: statusOf(it)}))
+                         .sort((a,b) => a.days - b.days);
+
+  const header = ['No','Nama Barang','Jumlah Stok','Tanggal Masuk','Tanggal Expired','Sisa Hari','Status'];
+  const rows = enriched.map((it, idx) => [
+    idx+1, it.name, it.stock, fmtDate(it.masuk), fmtDate(it.expired), it.days, statusLabel[it.status]
+  ]);
+
+  const escCsv = v => {
+    const s = String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const csv = [header, ...rows].map(r => r.map(escCsv).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const storeLabel = document.getElementById('storeTitle').textContent.replace(/[^a-z0-9]+/gi,'_');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `data-pakan-${storeLabel}-${dateStr}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
